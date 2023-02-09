@@ -1,0 +1,68 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+body{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+h1{
+    text-align: center;
+    margin: 0 auto;
+    padding: 2em;
+}
+#admin-login{
+    height: 738px;
+    width: 840px;
+    margin: 0 auto;
+}
+#input-form
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 50%;
+    margin: 0 auto;
+    padding: 2em;
+    border: 2px solid black;
+}
+#add-admin-form
+{
+    display: flex;
+    position: relative;
+    z-index: -1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 50%;
+    margin: 0 auto;
+    padding: 2em;
+    border: 2px solid black;
+    transform: rotate3d(0, 1, 0, -90deg);
+}
+.input-group{
+    width: 80%;
+    display: flex;
+    justify-content: flex-end;
+}
+a{
+    text-decoration: none;
+}
+button{
+    height: 50%;
+    cursor: pointer;
+}
