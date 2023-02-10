@@ -5,7 +5,6 @@
  * 3. create configuration file consisting database user and password in /var/ under [creds]
  */
 defined('VERSION') OR define('VERSION', '1.0.0');
-defined('PATH') OR define('PATH', __DIR__ );
-require_once PATH . '/user-interface/main-front.php';
+require_once '/var/www/html/user-interface/main-front.php';
 
 ?>

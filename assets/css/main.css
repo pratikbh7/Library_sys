@@ -66,3 +66,8 @@ button{
     height: 50%;
     cursor: pointer;
 }
+.error_class{
+    text-align: center;
+    position: relative;
+    bottom: 232px;
+}

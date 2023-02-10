@@ -51,3 +51,41 @@ the_animation.prototype.tick = function( time){
         this.req = requestAnimationFrame( this.tick.bind(this) );
     }
 }
+//revert back $ alias just in case another plugin uses it
+jQuery.noConflict(); 
+(function($){
+   $(document).ready(function(){
+    $('#input-form').on('submit', function(e){
+        e.preventDefault();
+        const username = document.forms['input-form']['username'].value;
+        const password = document.forms['input-form']['password'].value;
+        if( username === '' || password === ''){
+            alert("fill out the required fields");
+            return false;
+        }
+        const data = { login_input: { username: username, password: password} };
+        //ajax submission to avoid the annoying form resubmission
+        $.ajax({
+            method: 'POST',
+            url: 'user-interface/ajax-front-handlers.php',
+            dataType: 'json',
+            cache: false,
+            data: data,
+            success: function(data){
+                if( data.status === "unauthorized"){
+                    $('#input-form').css('outline', '3px solid red');
+                    var append_errors;
+                    const error_class = $('.error_class');
+                    error_class.children().remove('p');
+                    data.errors.forEach( function(element){
+                        append_errors = document.createElement('p');
+                        append_errors.innerHTML = element;
+                        error_class.append(append_errors);
+                    });
+                }
+                // else if( data.status === "authorized")
+            }        
+        })
+    })
+   }); 
+})(jQuery); 
