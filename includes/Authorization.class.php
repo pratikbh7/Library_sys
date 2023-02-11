@@ -24,6 +24,7 @@ class Authorization{
         $this->link = $link;
     }
 
+    //this is for adding new users through the admin page
     public function register_user($post_data){
         $fields = [ 'username' => 'string | required | unique: init_library_user, Username | between: 3,25 | alphanumeric',
                     'password' => 'string | required' ];
@@ -41,10 +42,13 @@ class Authorization{
                     'password' => 'string | required | valid_pass: init_library_user, Password' ];
         [ $inputs, $errors ] = $this->sanitize_validate( $post_data, $fields );
         if( $errors ){
+            $errors[ 'errors' ] = true;
             return $errors;
         }
         else{
-            return true;
+            $inputs[ 'userid' ] = $this->user_col['id'];
+            $inputs[ 'errors' ] = false;
+            return $inputs;
         }
     }
 
@@ -148,14 +152,5 @@ class Authorization{
             return true;
         }
         return password_verify($data[$field], $this->user_col[$column]);
-    }
-
-    public function register_user_data( $username, $password, $privileges){
-        $query = "INSERT INTO init_library_user(Username, Password, priviliges) VALUES(:username, :password, :privileges)";
-        $stmt = $this->link -> prepare($query);
-        $stmt->bindValue(":username", $username, \PDO::PARAM_STR);
-        $stmt->bindValue(":password", password_hash($password, PASSWORD_BCRYPT), \PDO::PARAM_STR);
-        $stmt->bindValue(":privileges", $privileges, \PDO::PARAM_INT);
-        return $stmt->execute();
     }
 }

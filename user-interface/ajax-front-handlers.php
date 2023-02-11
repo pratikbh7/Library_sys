@@ -1,28 +1,37 @@
 <?php
 //ajax form submission
 require_once  '/var/www/html/libs/helpers.php';
-use includes\Database;
-use includes\Authorization;
-$init = Database::get_db_instance();
-$link = $init->db_link();
+//only post requests
+if( is_get_request() ){
+    view('youshallnotpass');
+    exit;
+}
+
 if( is_post_request() ){
     $post_data = $_POST;
-    $auth = new Authorization($link);
+    $response = new stdClass();
     if( isset($post_data['login_input'])){
-        $authorize = $auth->login_user($post_data['login_input']);
-        $response = new stdClass();
-        if( $authorize === true ){
+        $authorize = $authorization->login_user($post_data['login_input']);
+        if( $authorize['errors'] === false ){
+            log_admin_in( $authorize );
             $response->status = "authorized"; 
             echo json_encode($response);
         }
-        else{
+        else if( $authorize['errors'] === true ){
             $response->status = "unauthorized";
             $response->errors = $authorize;
             echo json_encode($response);
         }
     } 
-    else if( isset($post_data['register_input'])){
-        $auth->register_user($post_data['register_input']);
+    else if( isset($post_data['installation_data'])){
+        if( register_user_data( $post_data['installation_data']['username'], $post_data['installation_data']['password'], 1 )){
+            $response->status = "success";
+            echo json_encode($response);
+        }
+        else{
+            $response->status = "failure";
+            echo json_encode($response);
+        }
     }
     else{
         die( 'Invalid server request' );

@@ -27,7 +27,7 @@ h1{
     width: 840px;
     margin: 0 auto;
 }
-#input-form
+#input-form, #installation-form
 {
     display: flex;
     flex-direction: column;
@@ -38,21 +38,6 @@ h1{
     margin: 0 auto;
     padding: 2em;
     border: 2px solid black;
-}
-#add-admin-form
-{
-    display: flex;
-    position: relative;
-    z-index: -1;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    width: 50%;
-    margin: 0 auto;
-    padding: 2em;
-    border: 2px solid black;
-    transform: rotate3d(0, 1, 0, -90deg);
 }
 .input-group{
     width: 80%;

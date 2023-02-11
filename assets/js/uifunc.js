@@ -1,76 +1,34 @@
-function add_admin_form(e){
-    e.stopPropagation();
-    const sel = document.getElementById.bind(document);
-    var target = e.target || e.srcElement;
-    var front_el, back_el;
-    if( target.id === 'add-admin' ){
-        front_el = sel('input-form');
-        back_el = sel('add-admin-form');
+function updateQueryStringParameter(uri, key, value) {
+    var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    if (uri.match(re)) {
+      return uri.replace(re, '$1' + key + "=" + value + '$2');
     }
-    else{
-        front_el = sel('add-admin-form');
-        back_el = sel('input-form');
+    else {
+      return uri + separator + key + "=" + value;
     }
-    const start_anim = new the_animation( front_el, back_el, 400 );
-}
-var elapsed;
-const cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
-function the_animation( el, elb, end_point ){
-    this.el = el;
-    this.elb = elb;
-    this.dx = ( this.end_point === 400 ) ? ( 90 / 400 ) : - ( 90/400 );
-    this.end_point = end_point; 
-    this.startTime = window.performance.now ? performance.now() : Date.now();
-    requestAnimationFrame( this.tick.bind(this) );
-}
-the_animation.prototype.tick = function( time){
-    this.now = ( !this.now ) ? time : this.now;
-    elapsed = ( time - this.now );
-    if( this.end_point === 0 ){
-        elapsed = 400 - elapsed;
-        if( elapsed < this.end_point){
-            elapsed = 0;
-        }
-    }
-    else{
-        if( elapsed > this.end_point ){
-            elapsed = 400;
-        }
-    }
-    this.el.style.transform = "rotate3d(0,1,0," + ( elapsed * this.dx ) + "deg)";
-    if( elapsed === this.end_point ){
-        cancelAnimationFrame(this.req);
-        if( this.end_point !== 0){
-            this.el.style.zIndex = -1;
-            this.elb.style.zIndex = 1;
-            now = null;
-            const second_anim = new the_animation( this.elb, this.el, 0 );
-        }
-    }
-    else{
-        this.req = requestAnimationFrame( this.tick.bind(this) );
-    }
-}
+  }
 //revert back $ alias just in case another plugin uses it
 jQuery.noConflict(); 
 (function($){
    $(document).ready(function(){
+    var username, password, uri, query_stat, value, query_ap;
     $('#input-form').on('submit', function(e){
         e.preventDefault();
-        const username = document.forms['input-form']['username'].value;
-        const password = document.forms['input-form']['password'].value;
+        username = document.forms['input-form']['username'].value;
+        password = document.forms['input-form']['password'].value;
         if( username === '' || password === ''){
             alert("fill out the required fields");
             return false;
         }
-        const data = { login_input: { username: username, password: password} };
+        const login_data = { login_input: { username: username, password: password} };
         //ajax submission to avoid the annoying form resubmission
         $.ajax({
             method: 'POST',
             url: 'user-interface/ajax-front-handlers.php',
             dataType: 'json',
             cache: false,
-            data: data,
+            data: login_data,
             success: function(data){
                 if( data.status === "unauthorized"){
                     $('#input-form').css('outline', '3px solid red');
@@ -83,8 +41,49 @@ jQuery.noConflict();
                         error_class.append(append_errors);
                     });
                 }
-                // else if( data.status === "authorized")
+                else if( data.status === "authorized" ){
+                    //replace to remove previous page option
+                    uri = '/user-interface/homepage.php';
+                    query_stat = 'status';
+                    value = "success";
+                    query_ap = updateQueryStringParameter( uri, query_stat, value );
+                    window.location.replace(query_ap);
+                }
             }        
+        })
+    })
+    $('#installation-form').on( 'submit', function(e){
+        e.preventDefault();
+        console.log('gg');
+        username = document.forms['installation-form']['admin_name'].value;
+        password = document.forms['installation-form']['admin_password'].value;
+        if( username === '' || password === ''){
+            alert("fill out the required fields");
+            return false;
+        }
+        const installation_data = { installation_data: { username: username, password: password } };
+        $.ajax({
+            method: 'POST',
+            url: 'user-interface/ajax-front-handlers.php',
+            dataType: 'json',
+            cache: false,
+            data: installation_data,
+            success: function(data){
+                if( data.status === "success" ){
+                    uri = '/index.nginx-debian.php';
+                    query_stat = data.status;
+                    value = "status";
+                    query_ap = updateQueryStringParameter( uri, query_stat, value );
+                    window.location.replace(query_ap);
+                }
+                else if( data.status === "failure" ){
+                    const error_class = $('.error_class');
+                    error_class.children().remove('p');
+                    const error = document.createElement('p');
+                    error.innerHTML = "Some error encountered with server";
+                    error_class.append(error); 
+                }
+            }
         })
     })
    }); 

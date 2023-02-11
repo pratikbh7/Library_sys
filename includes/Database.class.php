@@ -7,15 +7,14 @@ class Database{
 
     private static $instance; //singleton lb_database object
 
-    private static $link; //single connection
-
-    public static $testing;
+    public static $link; //single connection
 
     private $tables = array( 'init_library_user' => 
     "(`id`           INT(11)      NOT NULL AUTO_INCREMENT,
       `Username`     VARCHAR(128) NOT NULL,
       `Password`     VARCHAR(50)  NOT NULL,
       `privileges`   INT(11)      NOT NULL DEFAULT '1',
+      `ADMIN`        VARCHAR(50),  
       PRIMARY KEY (`id`),
       INDEX username (`Username`)
     )",
@@ -33,11 +32,23 @@ class Database{
       INDEX author ( `Author` ),
       INDEX year ( `Release Year` ),
       INDEX burrower( `Burrower` )
-    )");
+    )",
+    'init_admin_token' => "(
+        `id`               INT AUTO_INCREMENT PRIMARY KEY,
+        `selector`         VARCHAR(255) NOT NULL,
+        `hashed_validator` VARCHAR(255) NOT NULL,
+        `admin_id`         INT      NOT NULL,
+        `expiry`           DATETIME NOT NULL,
+        CONSTRAINT fk_user_id
+            FOREIGN KEY (admin_id)
+                REFERENCES `init_library_user` (id) ON DELETE CASCADE
+    )"
+    );
 
-    // public function __construct(){
-    //     $this->init_tables();
-    // }
+    public function __construct(){
+        self::$link = $this->db_link();
+        $this->init_tables(self::$link);
+    }
 
     public static function get_db_instance(){
         if(!self::$instance){
@@ -46,7 +57,7 @@ class Database{
         return self::$instance;
     }
 
-    public function db_link(): \PDO {
+    private function db_link(): \PDO {
         if (!self::$link) {
             $config = parse_ini_file('/var/librarydb.ini', true);   
             $creds = $config['creds'];
@@ -67,4 +78,5 @@ class Database{
             $stmt->execute(); 
         }
     }
+    
 }
