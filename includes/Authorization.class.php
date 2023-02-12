@@ -10,6 +10,7 @@ class Authorization{
     private $user_col = false;
 
     private $validation_errors =[
+        'string' => 'The %s must be a string',
         'required' => 'The %s is required',
         'min' => 'The %s must have at least %s characters',
         'max' => 'The %s must have at most %s characters',
@@ -24,17 +25,20 @@ class Authorization{
         $this->link = $link;
     }
 
-    //this is for adding new users through the admin page
+    //this is for adding new users through the admin page as well
     public function register_user($post_data){
         $fields = [ 'username' => 'string | required | unique: init_library_user, Username | between: 3,25 | alphanumeric',
                     'password' => 'string | required' ];
         [ $inputs, $errors ] = $this->sanitize_validate( $post_data, $fields );
         if( $errors ){
+            $errors['errors'] = true;
             return $errors;
         }
         else{
-            return true;
+            $inputs['errors'] = false;
+            return $inputs;
         }
+        
     }
 
     public function login_user($post_data){
@@ -56,7 +60,7 @@ class Authorization{
         $inputs = array();
         $errors = array();
         foreach( $data as $key => $value){
-            $inputs[] = filter_var( $value, FILTER_SANITIZE_STRING ); //sanitization
+            $inputs[$key] = filter_var( $value, FILTER_SANITIZE_STRING ); //sanitization
             $get_options = array_map( 'trim', explode(" | ", $fields[$key]) );
             foreach( $get_options as $option ){
                 $params= [];
@@ -65,10 +69,16 @@ class Authorization{
                     $params = array_map( 'trim', explode(',', $params));
                 }
                 $rule = 'is_' . $option;
-                if( is_callable(array($this, $rule ))){
+                if( is_callable(array($this, $rule )) ){
                     $validate = $this->$rule($data, $key, ...$params);
                     if( !$validate ){
                         $errors[] = sprintf($this->validation_errors[$option],$key,...$params);
+                    }
+                }
+                else if( is_callable($rule)){
+                    $validate = $rule($data[$key]);
+                    if(!$validate){
+                        $errors[] = sprintf($this->validation_errors[$option],$key);
                     }
                 }
             }
@@ -132,12 +142,10 @@ class Authorization{
         if (!isset($data[$field])) {
             return true;
         }
-
-        $query = "SELECT $column FROM $table WHERE $column = :value";
+        $query = "SELECT * FROM $table WHERE $column = :value LIMIT 1";
         $stmt = $this->link->prepare($query);
         $stmt->bindValue(":value", $data[$field], \PDO::PARAM_STR);
-        $stmt->execute();
-        if($stmt->fetchColumn() === true ) {
+        if(  $stmt->execute()){
             $this->user_col = $stmt->fetch(\PDO::FETCH_ASSOC);
             return true;
         }

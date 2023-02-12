@@ -13,23 +13,30 @@ if( is_post_request() ){
     if( isset($post_data['login_input'])){
         $authorize = $authorization->login_user($post_data['login_input']);
         if( $authorize['errors'] === false ){
-            log_admin_in( $authorize );
+            session_start();
+            session_regenerate_id();
+            $test = log_admin_in( $authorize );
+            $response->test = $test;
             $response->status = "authorized"; 
             echo json_encode($response);
         }
         else if( $authorize['errors'] === true ){
             $response->status = "unauthorized";
+            unset($authorize['errors']);
             $response->errors = $authorize;
             echo json_encode($response);
         }
     } 
     else if( isset($post_data['installation_data'])){
-        if( register_user_data( $post_data['installation_data']['username'], $post_data['installation_data']['password'], 1 )){
+        $authorize = $authorization->register_user($post_data['insatallation_data']);
+        if( $authorize['errors'] === false ){
+            register_admin_data( $authorize['username'], $authorize['password'], 1, 'LBADMIN' );
             $response->status = "success";
             echo json_encode($response);
         }
-        else{
+        else if( $authorize['errors'] === true ){
             $response->status = "failure";
+            $response->errors = $authorize;
             echo json_encode($response);
         }
     }

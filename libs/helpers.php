@@ -11,9 +11,11 @@ spl_autoload_register( function($class){
 });
 use includes\Database;
 use includes\Authorization;
+use includes\Adminajax;
 
 $init_db = Database::get_db_instance();
 $authorization = new Authorization(db_link());
+$homepage_ajax = new Adminajax(db_link());
 
 function db_link(){
     static $link;
@@ -32,7 +34,20 @@ function admin_user_exists( $link ){
     return $stmt->fetchColumn();
 }
 
-function register_user_data( string $username, string $password, int $privileges, string $admin = "" ){
+function is_admin(){
+    $id = $_SESSION['userdata']['userid'];
+    $name = $_SESSION['userdata']['username'];
+    $admin = "LBADMIN";
+    $query = "SELECT * FROM init_library_user WHERE Username = :user AND id = :id AND `ADMIN` = :admin_value";
+    $stmt = db_link()->prepare($query);
+    $stmt->bindValue(":user", $name, PDO::PARAM_STR);
+    $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+    $stmt->bindValue(":admin_value", $admin, PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->fetchColumn();
+}
+
+function register_admin_data( string $username, string $password, int $privileges, string $admin = "" ){
     $query = "INSERT INTO init_library_user(Username, `Password`, privileges, `ADMIN`) VALUES(:username, :pass, :privileges, :adm)";
     $stmt = db_link()->prepare($query);
     $stmt->bindValue(":username", $username, PDO::PARAM_STR);
@@ -53,7 +68,7 @@ function is_admin_logged_in():bool{
         $admin = find_admin_by_token($token);
         //populate session variables and log admin in
         if( $admin){
-            return log_in_admin($admin);
+            return log_admin_in($admin);
         }
     }
     return false;
@@ -74,10 +89,10 @@ function log_admin_out(){
 }
 
 function log_admin_in( $admin ){
-    if( session_regenerate_id() && !isset( $_SESSION['userdata']['username']) ){
+    if( !isset( $_SESSION['userdata']['username'] ) && !isset( $_SESSION['userdata']['username'] ) ){
+        remember_admin($admin['userid']);
         $_SESSION['userdata']['username'] = $admin['username'];
         $_SESSION['userdata']['userid'] = $admin['userid'];
-        remember_admin($admin['userid']);
         return true;
     }
     return false;
@@ -164,7 +179,7 @@ function find_admin_by_token(string $token){
     return $statement->fetch(PDO::FETCH_ASSOC);
 }
 
-function token_is_valid(string $token): bool { // parse the token to get the selector and validator [$selector, $validator] = parse_token($token);
+function token_validity(string $token): bool { // parse the token to get the selector and validator [$selector, $validator] = parse_token($token);
     $tokens = find_admin_token_by_selector($selector);
     if (!$tokens) {
         return false;
@@ -176,17 +191,17 @@ function remember_admin(int $admin_id, int $day = 30){
     [$selector, $validator, $token] = generate_tokens();
 
     // remove all existing token associated with the admin id
-    delete_admin_token($user_id);
+    delete_admin_token($admin_id);
 
     // set expiration date
     $expired_seconds = time() + 60 * 60 * 24 * $day;
 
     // insert a token to the database
     $hash_validator = password_hash($validator, PASSWORD_DEFAULT);
-    $expiry = date('Y-m-d H:i:s', $expired_seconds);
+    $expiry = date('Y-m-d H:i:s', $expired_seconds, '/'); //for availability in the entire domain
 
     if (insert_admin_token($admin_id, $selector, $hash_validator, $expiry)) {
-        setcookie('remember_me', $token, $expired_seconds);
+        setcookie('remember_admin', $token, $expired_seconds);
     }
 }
 

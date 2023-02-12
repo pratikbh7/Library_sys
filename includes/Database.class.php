@@ -12,7 +12,7 @@ class Database{
     private $tables = array( 'init_library_user' => 
     "(`id`           INT(11)      NOT NULL AUTO_INCREMENT,
       `Username`     VARCHAR(128) NOT NULL,
-      `Password`     VARCHAR(50)  NOT NULL,
+      `Password`     VARCHAR(256)  NOT NULL,
       `privileges`   INT(11)      NOT NULL DEFAULT '1',
       `ADMIN`        VARCHAR(50),  
       PRIMARY KEY (`id`),

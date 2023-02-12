@@ -2,20 +2,22 @@
 if( !defined('PATH') ){
     require_once "/var/www/html/components/youshallnotpass.php";
     exit;
-} 
-if( is_user_logged_in()){
+}
+if( is_admin_logged_in()){
     header('Location:' . PATH . '/user-interface/homepage.php' );
 }
 else{
 view('header'); 
-if( is_get_request() && isset($_GET['status']) ){
+if( is_get_request() && isset($_GET['status']) && ($_GET['status'] === 'success')){
     $welcome_notice = true;
+    $welcome_text = "<div class='success_class'><p>Admin account setup successful. Please login. </p></div>";
+    $welcome_text = htmlspecialchars($welcome_text);
 }
 ?>
 <body>
     <h1>LIBRARY SYSTEM v<?php echo VERSION; ?> </h1>
-    <?php if($welcome_notice === true){
-        echo "<p>Admin account setup successful. Please login. </p>";
+    <?php if(isset($welcome_notice) && $welcome_notice === true){
+        echo $welocme_text;
     } ?>
     <div id="admin-login">
         <form id="input-form" method="POST"> 

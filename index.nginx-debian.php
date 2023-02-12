@@ -6,10 +6,14 @@
  */
 require_once '/var/www/html/libs/helpers.php';
 require_once '/var/www/html/installation-script.php';
-// require_once PATH . 'installation-script.php';
-//  session,cookies, installation script
 /**
  * personal tasks:
- * 1. __sleep and __wakeup to commit and commit and reestablish db data
+ * 1. __sleep and __wakeup to commit and reestablish db data
+ * 2. nonces to make valid ajax requests from admin homepage
  */
+ /**
+  * Issues:
+  *1. Cookies somehow dont persist after redirection to the main domain, i've changed the availability of cookie to entire domain but havent tested yet
+  *
+  */
 ?>
