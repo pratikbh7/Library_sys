@@ -1,8 +1,6 @@
 <nav id="navbar">
   <a id="dash">DASHBOARD</a>
   <a id="list">LIST BOOKS</a>
-  <a id="issue">ISSUE</a>
-  <a id="return">RETURN</a>
-  <a id="add">ADD</a>
-  <a id="delete">DELETE</a>
+  <a id="issued_list">ISSUED</a>
+  <a id="add_form">ADD NEW BOOK</a>
 </nav>

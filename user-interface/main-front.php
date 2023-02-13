@@ -3,8 +3,9 @@ if( !defined('PATH') ){
     require_once "/var/www/html/components/youshallnotpass.php";
     exit;
 }
+session_start();
 if( is_admin_logged_in()){
-    header('Location:' . PATH . '/user-interface/homepage.php' );
+    header('Location:/user-interface/homepage.php' );
 }
 else{
 view('header'); 
@@ -23,11 +24,11 @@ if( is_get_request() && isset($_GET['status']) && ($_GET['status'] === 'success'
         <form id="input-form" method="POST"> 
             <div class="input-group" id="username">
                 <label for="username">Username:</label>
-                <input required type="text" name="login_input[username]" id="username" autocomplete="off" placeholder="username" value=""> 
+                <input required type="text" name="login_input[username]" id="username" autocomplete="off" placeholder="username"> 
             </div>
             <div class="input-group" id="password">
                 <label for="password">Password:</label>
-                <input required type="password" name="login_input[password]" id="password" autocomplete="off" placeholder="password" value=""> 
+                <input required type="password" name="login_input[password]" id="password" autocomplete="off" placeholder="password"> 
             </div>
             <div class="button" id="button">
                 <button id="login-button" type="submit">LOGIN</button>

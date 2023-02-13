@@ -1,24 +1,40 @@
 <?php
 require_once '/var/www/html/libs/helpers.php';
 if( is_post_request()){
+    session_start();
     if( is_admin_logged_in() && is_admin() ){
-        $post_data = $_POST['action'];
-        $callback = strtolower($post_data);
-        $allowed_calls = [ 'list', 'add', 'issue', 'return', 'delete'];
-        if( in_array( $callback, $allowed_calls )){
-            $post_data = $post_data === 'list' ? $post_data . '_books' : $post_data . '_book';
-            if( is_callable(array($homepage_ajax, $post_data))){
-                $response = new stdClass();
-                $perform_action = $homepage_ajax->$post_data;
-                if( $perform_action['errors'] === false  ){
-                    $response->status="success";
+        $post_action = $_POST['action'];
+        $callback = strtolower($post_action);
+        $dbupdate_calls = [ 'add', 'delete', 'issue', 'return' ];
+        $response = new stdClass();
+        if( in_array( $callback, $dbupdate_calls)){
+            $post_data = $_POST['data'];
+            $callback = $callback . '_book';
+            foreach( $post_data as $key => $value){
+                $post_data[$key] = filter_var($value, FILTER_SANITIZE_STRING );
+            }
+            if( is_callable(array($homepage_ajax, $callback))){
+                if( $callback === 'add_book' ){
+                    if( $homepage_ajax->duplication_check($post_data)){
+                        if( $homepage_ajax->$callback($post_data)){
+                            $status = "success";
+                        }
+                        else{
+                            $status = "failure";
+                        }
+                    }
+                    else{
+                        $response->message = "exists";
+                    }
                 }
-                else if( $perform_action['errors'] === true){
-                    $response->status = "failure";
-                    $response->error = $perform_action['the_error'];
-                }
-            }   
+            }
+            $response->status = $status;
+            echo json_encode($response);
         }
+        else{
+            $response->status = "invalid call";
+            echo json_encode($response);
+        }  
     }
 }
 else if( is_get_request()){

@@ -13,6 +13,7 @@ jQuery.noConflict();
 (function($){
    $(document).ready(function(){
     var username, password, uri, query_stat, value, query_ap;
+    query_ap = "http://localhost";
     $('#input-form').on('submit', function(e){
         e.preventDefault();
         username = document.forms['input-form']['username'].value;
@@ -46,7 +47,7 @@ jQuery.noConflict();
                     uri = '/user-interface/homepage.php';
                     query_stat = 'status';
                     value = "success";
-                    query_ap = updateQueryStringParameter( uri, query_stat, value );
+                    query_ap += updateQueryStringParameter( uri, query_stat, value );
                     window.location.replace(query_ap);
                 }
             }        
@@ -54,7 +55,6 @@ jQuery.noConflict();
     })
     $('#installation-form').on( 'submit', function(e){
         e.preventDefault();
-        console.log('gg');
         username = document.forms['installation-form']['admin_name'].value;
         password = document.forms['installation-form']['admin_password'].value;
         if( username === '' || password === ''){
@@ -73,7 +73,7 @@ jQuery.noConflict();
                     uri = '/index.nginx-debian.php';
                     query_stat = "status";
                     value = "success";
-                    query_ap = updateQueryStringParameter( uri, query_stat, value );
+                    query_ap += updateQueryStringParameter( uri, query_stat, value );
                     window.location.replace(query_ap);
                 }
                 else if( data.status === "failure" ){
@@ -85,33 +85,74 @@ jQuery.noConflict();
                 }
             }
         })
-    })
+    });
+    var message, child, method, action_data, formdata;
     $('#navbar > a').on( 'click', function(e){
         e.preventDefault();
-        var message;
-        var method = this.textContent;
-        if(method === 'DASHBOARD'){
+        console.log(query_ap);
+        method = this.id;
+        child = $('.books_data').children(':first-child');
+        if(method === 'dash'){
             window.location.href = "/user-interface/homepage.php";
         }
-        // else{
-        //     const action_data = { action : method };
-        //     $.ajax({
-        //         method: 'POST',
-        //         url: '/user-interface/homepghandlers.php',
-        //         dataType: 'json',
-        //         data: action_data,
-        //         success: function(data){
-        //             if( data.status === "success"){
-        //                 message = data.message;
+        else if( method === 'list' || method === 'issued_list' || method === 'add_form'){
+            uri = "/user-interface/homepage.php";
+            query_stat = "getPage";
+            switch(method){
+                case 'list':
+                    value = "list_books";
+                    query_ap += updateQueryStringParameter( uri, query_stat, value);
+                    window.location.href = query_ap;
+                    break;
+                
+                case 'issued_list':
+                    value = "list_issued";
+                    query_ap += updateQueryStringParameter( uri, query_stat, value);
+                    window.location.href = query_ap;
+                    break;
 
-        //             }
-        //             else if( data.status === "failure"){
-        //                 message= data.errormsg;
-        //             }
-        //         }
-        //     });
-        // }
+                case 'add_form':
+                    value = "add_form_get";
+                    query_ap += updateQueryStringParameter( uri, query_stat, value);
+                    window.location.href = query_ap;
+                    break;
+            }
+        }
+        else{
+            $('.ajax-status').text('Invalid URL request');
+        }
         
+    });
+    var author, title, release_year;
+    $('#add-book').on( 'submit', function(e){
+        e.preventDefault();
+        method = "add";
+        author = $('#book_author').val();
+        title = $('#book_title').val();
+        release_year = $('#book_year').val();
+        formdata= { author: author, title: title, release_year: release_year };
+        action_data = { action: method, data: formdata};
+        $.ajax({
+            method: 'POST',
+            url: '/user-interface/homepghandlers.php',
+            dataType: 'json',
+            data: action_data,
+            success: function(data){
+                console.log(data);
+                if( data.status === "success"){
+                    $('.ajax-status').text('Book added successfully');
+                }
+                else if( data.status === "failure"){
+                    $('.ajax-status').text('Book could not be added to database');
+                }
+                else if( data.message === "exists"){
+                    $('.ajax-status').text('Book already exists');
+                }
+                else if( data.status === "invalid call"){
+                    $('.ajax-status').text('Invalid Call');
+                }
+            }
+        })
     })
    }); 
 })(jQuery); 
