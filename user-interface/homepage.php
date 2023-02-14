@@ -5,6 +5,7 @@ if( !is_admin_logged_in()){
     header('Location: http://localhost/index.nginx-debian.php' );
     exit;
 }
+$test = "gggg";
 if( is_get_request()){
     if( isset($_GET['getPage'])){
         $value = filter_var( $_GET['getPage'], FILTER_SANITIZE_STRING);
@@ -13,7 +14,7 @@ if( is_get_request()){
             switch($value){
                 
                 case "list_books":
-                    // $data = $homepage_ajax->list_books(0);
+                    $data = $homepage_ajax->list_books(0);
                     $get = "listtable";
                     break;
                 
@@ -35,6 +36,7 @@ if( is_get_request()){
     else{
         $get = "dashboard";
     }
+var_dump($data);
 }
 view('header');
 ?>

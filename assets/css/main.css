@@ -139,7 +139,7 @@ h2{
 
 .fl-table td {
     border-right: 1px solid #9d8e8e;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .fl-table thead th {
@@ -270,3 +270,9 @@ h2{
     text-align: center;
     top: 30%;
 }
+ .blue_cell{
+    background: blue;
+ }
+  .red-cell{
+    background: red;
+  }
