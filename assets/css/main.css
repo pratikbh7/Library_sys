@@ -276,3 +276,74 @@ h2{
   .red-cell{
     background: red;
   }
+  .book_desc{
+    color:brown;
+  }
+
+  .blue_cell, .red-cell{
+    border: 2px solid #9d8e8e;
+  }
+
+  .delete_book{
+    color:red;
+  }
+
+  .book_action{
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    background: wheat;
+    font-size: 0.6em;
+    width: 100px;
+    text-align: center;
+    height: 53px;
+  }
+
+  .the_action{
+    color: #070663;
+  }
+
+  .book_action > ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  a.boxclose{
+    position:absolute;
+    float: right;
+    margin-top:-44px;
+    margin-right:-86px;
+    cursor:pointer;
+    color: #fff;
+    border: 1px solid #AEAEAE;
+    border-radius: 30px;
+    background: red;
+    font-size: 31px;
+    font-weight: bold;
+    display: none;
+    line-height: 0px;
+    padding: 11px 3px;       
+}
+
+.boxclose:before {
+    content: "×";
+
+}
+
+.action_status{
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 95px;
+}
+
+#action_form{
+    position: absolute;
+    display: none;
+}
+
+#action_form > .input-group{
+    width: auto;
+}

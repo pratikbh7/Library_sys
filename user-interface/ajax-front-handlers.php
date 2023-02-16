@@ -15,7 +15,7 @@ if( is_post_request() ){
         if( $authorize['errors'] === false ){
             session_start();
             session_regenerate_id();
-            $test = log_admin_in( $authorize );
+            $test = HelperClass::log_admin_in( $authorize );
             $response->test = $test;
             $response->status = "authorized"; 
             echo json_encode($response);
@@ -30,7 +30,7 @@ if( is_post_request() ){
     else if( isset($post_data['installation_data'])){
         $authorize = $authorization->register_user($post_data['insatallation_data']);
         if( $authorize['errors'] === false ){
-            register_admin_data( $authorize['username'], $authorize['password'], 1, 'LBADMIN' );
+            HelperClass::register_admin_data( $authorize['username'], $authorize['password'], 1, 'LBADMIN' );
             $response->status = "success";
             echo json_encode($response);
         }

@@ -8,6 +8,7 @@ function updateQueryStringParameter(uri, key, value) {
       return uri + separator + key + "=" + value;
     }
   }
+
 //revert back $ alias just in case another plugin uses it
 jQuery.noConflict(); 
 (function($){
@@ -138,7 +139,6 @@ jQuery.noConflict();
             dataType: 'json',
             data: action_data,
             success: function(data){
-                console.log(data);
                 if( data.status === "success"){
                     $('.ajax-status').text('Book added successfully');
                 }
@@ -154,5 +154,58 @@ jQuery.noConflict();
             }
         })
     })
+    var offsets, corres_id, el_id, get_id_int,set_top,set_left;
+    function revert_css(parent){
+        parent.css({"width":"100px","height":"58px"});
+        parent.children("a.boxclose").css({"margin-top":"-44px","margin-right":"-86px"});
+        parent.children('a').hide();
+        parent.children('ul').css({"display":"block"});
+        parent.hide();
+    }
+    $('.boxclose').on('click', function(e){
+        const parent = $(e.target).parent('.book_action');
+        revert_css(parent);
+    })
+    $('.book_desc').on( 'click', function(e){
+        e.preventDefault();
+        var parent = $('.book_action');
+        parent.hide();
+        revert_css(parent);
+        $("#action_form").hide();
+        offsets = $(this)[0].getBoundingClientRect();
+        set_top = (offsets.top + 18);
+        set_left = (offsets.left);
+        el_id = this.id;
+        get_id_int = parseInt(el_id.match(/\d+/)[0]);
+        corres_id = "#action_"+get_id_int;
+        $(corres_id).css({"top":set_top+"px", "left":set_left+"px"});
+        $(corres_id).slideDown("slow", function(){
+            $( corres_id ).children('a').css({"display":"inline-block"});
+        });
+        $(corres_id).css({ "display":"flex"})
+        // $.ajax({
+        //     method: 'POST',
+        //     url: '/user-interface/homepghandlers.php',
+        //     dataType: 'json',
+        //     data: { action : method },
+        //     success: function(data){
+        //         if( data.status === "success"){
+        //             console.log('gg');
+        //         }
+        //     }
+        // })
+    });
+    $('.the_action').on('click',function(e){
+        var parent = $(e.target).closest(".book_action");
+        var parent_id = $(parent).attr('id');
+        var the_form = $('#action_form');
+        if( this.textContent === "Issue"){
+            parent.children("ul").css({"display":"none"});
+            parent.children("a.boxclose").css({"margin-top":"-58px","margin-right":"-270px"});
+            parent.css({"width": "275px", "height":"71px"});
+            parent.append(the_form);
+            the_form.css({"display": "block"})
+        }
+    });
    }); 
 })(jQuery); 

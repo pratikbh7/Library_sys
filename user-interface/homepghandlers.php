@@ -2,7 +2,7 @@
 require_once '/var/www/html/libs/helpers.php';
 if( is_post_request()){
     session_start();
-    if( is_admin_logged_in() && is_admin() ){
+    if( HelperClass::is_admin_logged_in() && HelperClass::is_admin() ){
         $post_action = $_POST['action'];
         $callback = strtolower($post_action);
         $dbupdate_calls = [ 'add', 'delete', 'issue', 'return' ];

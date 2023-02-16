@@ -4,7 +4,7 @@ if( !defined('PATH') ){
     exit;
 }
 session_start();
-if( is_admin_logged_in()){
+if( HelperClass::is_admin_logged_in()){
     header('Location:/user-interface/homepage.php' );
 }
 else{

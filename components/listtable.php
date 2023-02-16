@@ -1,30 +1,34 @@
 <?php if(!defined('PATH')){
     require_once '/var/www/html/components/youshallnotpass.php';
 }?>
+<div class="action_status"><p></p></div>
 <div class="table-wrapper">
     <table class="fl-table">
         <thead>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Release Year</th>
-            <th>Status</th>
-            <th>Overtime</th>
-        </tr>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Release Year</th>
+                <th>Status</th>
+                <th>Overtime</th>
+            </tr>
         </thead>
         <tbody>
         <?php 
         global $data;
+        $index = 0;
         foreach($data as $key => $value){
                     $back = "blue" . '_cell';
                     $overtime = "";
-                    if( $data['status'] === 1 ){
+                    $penalty = 0;
+                    $book_action = htmlspecialchars("Issue");
+                    if( $value['Status'] === 1 ){
                         $back = "red" . '_cell';
+                        $book_action = htmlspecialchars("Return");
                         $burrowed = filter_var($data['Burrowed Date'], FILTER_SANITIZE_STRING );
                         $burrowed = strtotime($burrowed);
                         $now = strtotime("now");
                         $difference = $now - $burrowed;
-                        $penalty = 0;
                         if( $difference > 86400){ //10 days
                             $penalty = 10 * ( intval($difference/ 8640) );
                             $overtime = htmlspecialchars("past due");
@@ -32,15 +36,31 @@
                         $back = $back . '_cell';
                         $back = htmlspecialchars($back);
                     }
-                ?>  
-                <tr>
-                    <td><?php echo htmlspecialchars(filter_var($value['Title'], FILTER_SANITIZE_STRING)); ?></td>
+                ?>
+                <div class="book_action" id="action_<?php echo $index;?>">
+                    <a class="boxclose" id="boxclose"></a>
+                    <ul>
+                        <li><a href="javascript:void(0)" class="the_action"><?php echo $book_action ?></a></li>
+                        <li><a href="javascript:void(0)" class="delete_book">Delete</a></li>
+                    </ul>
+                </div>  
+                <tr id="identifier_<?php echo $index;?>" class="book_row">
+                    <td><a href="javascript:void(0)" class="book_desc" id="book_id_<?php echo $index;?>" ><?php echo htmlspecialchars(filter_var($value['Title'], FILTER_SANITIZE_STRING)); ?></a></td>
                     <td><?php echo htmlspecialchars(filter_var($value['Author'], FILTER_SANITIZE_STRING)); ?></td>
                     <td><?php echo htmlspecialchars(filter_var($value['Release Year'], FILTER_SANITIZE_STRING)); ?></td>
                     <td class="<?php echo $back; ?>"></td>
                     <td data-penalty = <?php echo $penalty; ?>><?php echo $overtime; ?></td>
                 </tr>
-            <?php } ?>
+            <?php 
+            ++$index;
+        } ?>
         <tbody>
     </table>
 </div>
+<form id="action_form" method="POST">
+    <div class="input-group" id="burrower">
+        <label for="burrower">Burrower:</label>
+        <input required type="text" name="action_input[burrower]" id="burrower" autocomplete="off" placeholder="burrower"/> 
+    </div>
+    <button type="submit" id ="action_submit">ISSUE</button>
+</form>

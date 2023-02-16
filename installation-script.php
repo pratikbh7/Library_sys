@@ -4,7 +4,7 @@ if( !defined('PATH')){
     exit;
 }
 
-$skip_installation = admin_user_exists(db_link());
+$skip_installation = HelperClass::admin_user_exists(db_link());
 if( $skip_installation ){
     require_once PATH . '/user-interface/main-front.php';
 }
