@@ -183,21 +183,10 @@ jQuery.noConflict();
             $( corres_id ).children('a').css({"display":"inline-block"});
         });
         $(corres_id).css({ "display":"flex"})
-        // $.ajax({
-        //     method: 'POST',
-        //     url: '/user-interface/homepghandlers.php',
-        //     dataType: 'json',
-        //     data: { action : method },
-        //     success: function(data){
-        //         if( data.status === "success"){
-        //             console.log('gg');
-        //         }
-        //     }
-        // })
     });
     $('.the_action').on('click',function(e){
+        e.preventDefault();
         var parent = $(e.target).closest(".book_action");
-        var parent_id = $(parent).attr('id');
         var the_form = $('#action_form');
         if( this.textContent === "Issue"){
             parent.children("ul").css({"display":"none"});
@@ -207,5 +196,31 @@ jQuery.noConflict();
             the_form.css({"display": "block"})
         }
     });
+    $('#action_form').on('submit', function(e){
+        e.preventDefault();
+        var burrower = $('#burrower').val();
+        var parent = $(e.target).closest(".book_action");
+        var parent_id = $(parent).attr("id");
+        get_id_int = parseInt(el_id.match(/\d+/)[0]);
+        corres_id = "#identifier_"+get_id_int;
+        var book_details = $(corres_id).children('td');
+        const book_title = book_details.children('a')[0].textContent;
+        const book_author = book_details[1].textContent;
+        const book_ryear = book_details[2].textContent;
+        method = "issue";
+        formdata = { author: book_author, title: book_title, release_year: book_ryear, burrower: burrower };
+        action_data = { action: method, data: formdata};
+        $.ajax({
+            method: 'POST',
+            url: '/user-interface/homepghandlers.php',
+            dataType: 'json',
+            data: action_data,
+            success: function(data){
+                if( data.status === "success"){
+                    $('.action_status > p').text('Book issued successfully');
+                }
+            }
+        })
+    })
    }); 
 })(jQuery); 

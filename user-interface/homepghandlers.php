@@ -27,6 +27,20 @@ if( is_post_request()){
                         $response->message = "exists";
                     }
                 }
+                else if( $callback === 'issue_book'){
+                    if( $homepage_ajax->book_exists($post_data)){
+                        $post_data['burrow_d'] = date('Y-m-d', strtotime('now'));
+                        if( $homepage_ajax->$callback($post_data)){
+                            $status = "success";
+                        }
+                        else{
+                            $status = "success";
+                        }
+                    }
+                    else{
+                        $response->message = "!exists";
+                    }
+                }
             }
             $response->status = $status;
             echo json_encode($response);

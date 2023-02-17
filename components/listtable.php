@@ -23,14 +23,14 @@
                     $penalty = 0;
                     $book_action = htmlspecialchars("Issue");
                     if( $value['Status'] === 1 ){
-                        $back = "red" . '_cell';
+                        $back = "red";
                         $book_action = htmlspecialchars("Return");
-                        $burrowed = filter_var($data['Burrowed Date'], FILTER_SANITIZE_STRING );
+                        $burrowed = filter_var($value['Burrowed Date'], FILTER_SANITIZE_STRING );
                         $burrowed = strtotime($burrowed);
                         $now = strtotime("now");
                         $difference = $now - $burrowed;
-                        if( $difference > 86400){ //10 days
-                            $penalty = 10 * ( intval($difference/ 8640) );
+                        if( $difference > 864000){ //10 days
+                            $penalty = 10 * ( intval($difference/ 864000) );
                             $overtime = htmlspecialchars("past due");
                         }
                         $back = $back . '_cell';

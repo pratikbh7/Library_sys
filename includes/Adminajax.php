@@ -37,17 +37,16 @@ class Adminajax{
     }
 
     public function issue_book( $data ){
-        $query = "UPDATE $this->table SET Burrower = :burrower, `Burrowed Date` = :burrowed, COLUMN `Status` = :new_status 
-                  WHERE Title=:title AND Author=:author AND `Release Year` = :r_year AND `Status` = :old_status ";
+        $query = "UPDATE $this->table SET Burrower = :burrower, `Burrowed Date` = :burrowed,  `Status` = :new_status 
+                  WHERE Title=:title AND Author=:author AND `Release Year` = :r_year AND `Status` = :old_status";
         $stmt = $this->link->prepare($query);
         $old_status = 0;
         $new_status = 1;
         $stmt->bindValue(':title',$data['title'],\PDO::PARAM_STR);
         $stmt->bindValue(':author',$data['author'],\PDO::PARAM_STR);
-        $stmt->bindValue(':r_year',$data['r_year'],\PDO::PARAM_STR);
-        $stmt->bindValue(':book_status',$data['status'],\PDO::PARAM_STR);
-        $stmt->bindValue(':burrowd',$data['b_date'],\PDO::PARAM_STR);
-        $stmt->bindValue('burrower',$data['burrower'],\PDO::PARAM_STR);
+        $stmt->bindValue(':r_year',$data['release_year'],\PDO::PARAM_STR);
+        $stmt->bindValue(':burrowed',$data['burrow_d'],\PDO::PARAM_STR);
+        $stmt->bindValue(':burrower',$data['burrower'],\PDO::PARAM_STR);
         $stmt->bindValue(':new_status',$new_status,\PDO::PARAM_INT);
         $stmt->bindValue(':old_status',$old_status,\PDO::PARAM_INT);
         if($stmt->execute()){
@@ -60,14 +59,13 @@ class Adminajax{
 
     public function return_book( $data ){
         $query = "UPDATE $this->table SET Burrower = :burrower , `Burrowed Date` = :burrowed, `Status` = :new_status
-                  WHERE Title = :title AND Author=:author AND `Release Year` = :r_year AND `Status` = :old_status ";
+                  WHERE Title = :title AND Author=:author AND `Release Year` = :r_year AND `Status` = :old_status";
         $stmt = $this->link->prepare($query);
         $old_status = 1;
         $new_status = 0;
         $stmt->bindValue(':title',$data['title'],\PDO::PARAM_STR);
         $stmt->bindValue(':author',$data['author'],\PDO::PARAM_STR);
         $stmt->bindValue(':r_year',$data['r_year'],\PDO::PARAM_STR);
-        $stmt->bindValue(':book_status',$data['status'],\PDO::PARAM_STR);
         $stmt->bindValue(':burrowd',$data['b_date'],\PDO::PARAM_STR);
         $stmt->bindValue('burrower',$data['burrower'],\PDO::PARAM_STR);
         $stmt->bindValue(':new_status',$data['new_status'],\PDO::PARAM_STR);
@@ -115,7 +113,8 @@ class Adminajax{
 
     public function book_exists( $data ){
         $query = "SELECT * FROM $this->table 
-                  WHERE WHERE Title = :title AND Author = :author AND `Release Year` = :release_year LIMIT 1";
+                  WHERE Title = :title AND Author = :author AND `Release Year` = :release_year LIMIT 1";
+        $stmt = $this->link->prepare($query);
         $stmt->bindValue(':title',$data['title'],\PDO::PARAM_STR);
         $stmt->bindValue(':author',$data['author'],\PDO::PARAM_STR);
         $stmt->bindValue(':release_year',$data['release_year'],\PDO::PARAM_STR);
