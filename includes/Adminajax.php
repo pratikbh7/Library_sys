@@ -28,11 +28,11 @@ class Adminajax{
     }
 
     public function delete_book( $data ){
-        $query = "DELETE FROM $this->table WHERE Title = `:title` AND Author=`:author` AND `Release Year` = :r_year";
+        $query = "DELETE FROM $this->table WHERE Title = :title AND Author=:author AND `Release Year` = :r_year";
         $stmt = $this->link->prepare($query);
         $stmt->bindValue(':title',$data['title'],\PDO::PARAM_STR);
         $stmt->bindValue(':author',$data['author'],\PDO::PARAM_STR);
-        $stmt->bindValue(':r_year',$data['r_year'],\PDO::PARAM_STR);
+        $stmt->bindValue(':r_year',$data['release_year'],\PDO::PARAM_STR);
         return $stmt->execute();
     }
 
@@ -65,12 +65,17 @@ class Adminajax{
         $new_status = 0;
         $stmt->bindValue(':title',$data['title'],\PDO::PARAM_STR);
         $stmt->bindValue(':author',$data['author'],\PDO::PARAM_STR);
-        $stmt->bindValue(':r_year',$data['r_year'],\PDO::PARAM_STR);
-        $stmt->bindValue(':burrowd',$data['b_date'],\PDO::PARAM_STR);
+        $stmt->bindValue(':r_year',$data['release_year'],\PDO::PARAM_STR);
+        $stmt->bindValue(':burrowed',$data['burrow_d'],\PDO::PARAM_STR);
         $stmt->bindValue('burrower',$data['burrower'],\PDO::PARAM_STR);
-        $stmt->bindValue(':new_status',$data['new_status'],\PDO::PARAM_STR);
-        $stmt->bindValue(':old_status',$data['old_status'],\PDO::PARAM_STR);
-        return $stmt->execute();
+        $stmt->bindValue(':new_status',$new_status,\PDO::PARAM_STR);
+        $stmt->bindValue(':old_status',$old_status,\PDO::PARAM_STR);
+        if($stmt->execute()){
+            $query = "UPDATE init_book_count SET issue_count = issue_count - 1";
+            $stmt = $this->link->prepare($query);
+            return $stmt->execute();
+        }
+        return false;
     }
 
     public function list_books($start){

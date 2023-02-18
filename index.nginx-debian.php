@@ -13,7 +13,6 @@ require_once '/var/www/html/installation-script.php';
  */
  /**
   * Issues:
-  *1. Cookies somehow dont persist after redirection to the main domain, i've changed the availability of cookie to entire domain but havent tested yet
-  *
+  *1. Fetching table with pagination feautre not yet implemented
   */
 ?>

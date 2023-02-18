@@ -18,7 +18,7 @@ if( is_get_request()){
                     break;
                 
                 case "list_issued":
-                    // $data = $homepage_ajax->issued_books(0);
+                    $data = $homepage_ajax->issued_books(0);
                     $get = "listtable";
                     break;
 
@@ -33,6 +33,7 @@ if( is_get_request()){
         }
     }
     else{
+        $data = $homepage_ajax->get_book_count();
         $get = "dashboard";
     }
 }

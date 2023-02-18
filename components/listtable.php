@@ -22,15 +22,17 @@
                     $overtime = "";
                     $penalty = 0;
                     $book_action = htmlspecialchars("Issue");
+                    $burrower = "";
                     if( $value['Status'] === 1 ){
                         $back = "red";
+                        $burrower = $value['Burrower'];
                         $book_action = htmlspecialchars("Return");
                         $burrowed = filter_var($value['Burrowed Date'], FILTER_SANITIZE_STRING );
                         $burrowed = strtotime($burrowed);
                         $now = strtotime("now");
                         $difference = $now - $burrowed;
                         if( $difference > 864000){ //10 days
-                            $penalty = 10 * ( intval($difference/ 864000) );
+                            $penalty = 10 * ( intval(($difference-864000)/ 86400) );
                             $overtime = htmlspecialchars("past due");
                         }
                         $back = $back . '_cell';
@@ -48,7 +50,7 @@
                     <td><a href="javascript:void(0)" class="book_desc" id="book_id_<?php echo $index;?>" ><?php echo htmlspecialchars(filter_var($value['Title'], FILTER_SANITIZE_STRING)); ?></a></td>
                     <td><?php echo htmlspecialchars(filter_var($value['Author'], FILTER_SANITIZE_STRING)); ?></td>
                     <td><?php echo htmlspecialchars(filter_var($value['Release Year'], FILTER_SANITIZE_STRING)); ?></td>
-                    <td class="<?php echo $back; ?>"></td>
+                    <td class="<?php echo $back; ?>"><?php echo htmlspecialchars(filter_var($burrower, FILTER_SANITIZE_STRING)); ?></td>
                     <td data-penalty = <?php echo $penalty; ?>><?php echo $overtime; ?></td>
                 </tr>
             <?php 
@@ -60,7 +62,7 @@
 <form id="action_form" method="POST">
     <div class="input-group" id="burrower">
         <label for="burrower">Burrower:</label>
-        <input required type="text" name="action_input[burrower]" id="burrower" autocomplete="off" placeholder="burrower"/> 
+        <input required type="text" name="action_input[burrower]" id="burrower_val" autocomplete="off" placeholder="burrower"/> 
     </div>
     <button type="submit" id ="action_submit">ISSUE</button>
 </form>

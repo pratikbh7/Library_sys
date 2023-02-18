@@ -169,7 +169,6 @@ jQuery.noConflict();
     $('.book_desc').on( 'click', function(e){
         e.preventDefault();
         var parent = $('.book_action');
-        parent.hide();
         revert_css(parent);
         $("#action_form").hide();
         offsets = $(this)[0].getBoundingClientRect();
@@ -195,13 +194,44 @@ jQuery.noConflict();
             parent.append(the_form);
             the_form.css({"display": "block"})
         }
+        else if( this.textContent === "Return" ){
+            var parent_id = $(parent).attr("id");
+            get_id_int = parseInt(parent_id.match(/\d+/)[0]);
+            corres_id = "#identifier_"+get_id_int;
+            var book_details = $(corres_id).children('td');
+            const book_title = book_details.children('a')[0].textContent;
+            const book_author = book_details[1].textContent;
+            const book_ryear = book_details[2].textContent;
+            method = "return";
+            formdata = { author: book_author, title: book_title, release_year: book_ryear };
+            action_data = { action: method, data: formdata};
+            $.ajax({
+                method: 'POST',
+                url: '/user-interface/homepghandlers.php',
+                dataType: 'json',
+                data: action_data,
+                success: function(data){
+                    if( data.status === "success"){
+                        $('#action_form').hide();
+                        revert_css(parent);
+                        $(parent).find('.the_action').text('Issue');
+                        $('.action_status > p').text('Book returned successfully');
+                    }
+                }
+            })
+        }
+        else{
+            ('#action_form').hide();
+            revert_css(parent);
+            $('.action_status > p').text('Invalid Request');
+        } 
     });
     $('#action_form').on('submit', function(e){
         e.preventDefault();
-        var burrower = $('#burrower').val();
+        var burrower = $('#burrower_val').val();
         var parent = $(e.target).closest(".book_action");
         var parent_id = $(parent).attr("id");
-        get_id_int = parseInt(el_id.match(/\d+/)[0]);
+        get_id_int = parseInt(parent_id.match(/\d+/)[0]);
         corres_id = "#identifier_"+get_id_int;
         var book_details = $(corres_id).children('td');
         const book_title = book_details.children('a')[0].textContent;
@@ -217,10 +247,73 @@ jQuery.noConflict();
             data: action_data,
             success: function(data){
                 if( data.status === "success"){
+                    $('#action_form').hide();
+                    revert_css(parent);
+                    $(parent).find('.the_action').text('Return');
                     $('.action_status > p').text('Book issued successfully');
+                }
+                else if( data.status === "failure"){
+                    $('#action_form').hide();
+                    revert_css(parent);
+                    $('.action_status > p').text('Book could not be issued');
+                }
+                else if( data.message === '!exists'){
+                    $('#action_form').hide();
+                    revert_css(parent);
+                    $('.action_status > p').text('Book does not exist');
+                }
+                else{
+                    $('#action_form').hide();
+                    revert_css(parent);
+                    $('.action_status > p').text('Something went wrong')
                 }
             }
         })
+    })
+    $('.delete_book').on('click', function(e){
+        e.preventDefault();
+        var parent = $(e.target).closest(".book_action");
+        var parent_id = $(parent).attr("id");
+        get_id_int = parseInt(parent_id.match(/\d+/)[0]);
+        corres_id = "#identifier_"+get_id_int;
+        var book_details = $(corres_id).children('td');
+        const book_title = book_details.children('a')[0].textContent;
+        const book_author = book_details[1].textContent;
+        const book_ryear = book_details[2].textContent;
+        if(confirm('Delete book '+book_title+'?')){
+            method = "delete";
+            formdata = { author: book_author, title: book_title, release_year: book_ryear };
+            console.log(formdata);
+            action_data = { action: method, data: formdata};
+            $.ajax({
+                method: 'POST',
+                url: '/user-interface/homepghandlers.php',
+                dataType: 'json',
+                data: action_data,
+                success: function(data){
+                    if( data.status === "success"){
+                        $('#action_form').hide();
+                        revert_css(parent);
+                        $('.action_status > p').text('Book deleted successfully');
+                    }
+                    else if(data.status === "failure"){
+                        $('#action_form').hide();
+                        revert_css(parent);
+                        $('.action_status > p').text('Book could not be deleted');
+                    }
+                    else if(data.status === "!exists"){
+                        $('#action_form').hide();
+                        revert_css(parent);
+                        $('.action_status > p').text('Book does not exist');
+                    }
+                    else{
+                        $('#action_form').hide();
+                        revert_css(parent);
+                        $('.action_status > p').text('Something went wrong'); 
+                    }
+                }
+            })
+        }
     })
    }); 
 })(jQuery); 

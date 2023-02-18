@@ -34,12 +34,40 @@ if( is_post_request()){
                             $status = "success";
                         }
                         else{
-                            $status = "success";
+                            $status = "failure";
                         }
                     }
                     else{
                         $response->message = "!exists";
                     }
+                }
+                else if( $callback === "return_book" ){
+                    if( $homepage_ajax->book_exists($post_data)){
+                        $post_data['burrow_d'] = NULL;
+                        $post_data['burrower'] = " ";
+                        if( $homepage_ajax->$callback($post_data)){
+                            $status = "success";
+                        }
+                        else{
+                            $status = "failure";
+                        }
+                    }
+                    else{
+                        $response->message = "!exists";
+                    } 
+                }
+                else if( $callback === "delete_book"){
+                    if( $homepage_ajax->book_exists($post_data)){
+                        if( $homepage_ajax->$callback($post_data)){
+                            $status = "success";
+                        }
+                        else{
+                            $status = "failure";
+                        }
+                    }
+                    else{
+                        $response->message = "!exists";
+                    } 
                 }
             }
             $response->status = $status;
